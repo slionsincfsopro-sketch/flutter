@@ -33,13 +33,22 @@ class ProfileScreen extends StatelessWidget {
               child: Icon(Icons.person, size: 50, color: Colors.white),
             ),
             const SizedBox(height: 16),
-            Text(
-              'User Name',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            Text(
-              'user@example.com',
-              style: Theme.of(context).textTheme.bodyMedium,
+            Consumer<AuthService>(
+              builder: (context, auth, _) {
+                 final user = auth.currentUser;
+                 return Column(
+                  children: [
+                    Text(
+                      user?.displayName ?? 'User',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      user?.email ?? 'No Email',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ],
+                 );
+              }
             ),
             const SizedBox(height: 32),
             

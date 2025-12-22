@@ -6,9 +6,24 @@ import '../models/item_model.dart';
 import 'add_item_screen.dart';
 import 'item_details_screen.dart';
 import 'profile_screen.dart';
+import '../widgets/universal_image.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Seed mock data if empty (just for demo)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<FirestoreService>().seedMockData();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -146,13 +161,11 @@ class HomeScreen extends StatelessWidget {
                   Container(
                     width: double.infinity,
                     color: Colors.grey.shade200,
-                    child: Image.network(
-                      item.imageUrl,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => 
-                        const Icon(Icons.image_not_supported, size: 50, color: Colors.grey),
+                      child: UniversalImage(
+                        imageUrl: item.imageUrl,
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                  ),
                   Positioned(
                     top: 8,
                     right: 8,

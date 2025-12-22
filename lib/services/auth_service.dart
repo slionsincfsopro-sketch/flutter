@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
 class AuthService extends ChangeNotifier {
@@ -17,11 +18,24 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  Future<void> signUp(String email, String password) async {
+  Future<void> signUp(String email, String password, String name) async {
     try {
-      await _auth.createUserWithEmailAndPassword(email: email, password: password);
-      // Optional: Update display name
-      // await userCredential.user?.updateDisplayName(name);
+      final credential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      
+      // Try to save extra details, but don't fail the whole sign up if this part errors (e.g. network flaky)
+      try {
+        if (credential.user != null) {
+           await FirebaseFirestore.instance.collection('users').doc(credential.user!.uid).set({
+             'name': name,
+             'email': email,
+             'createdAt': FieldValue.serverTimestamp(),
+           });
+           await credential.user!.updateDisplayName(name);
+        }
+      } catch (e) {
+        print("Warning: Failed to save user profile: $e");
+      }
+      
       notifyListeners();
     } catch (e) {
       throw e.toString();

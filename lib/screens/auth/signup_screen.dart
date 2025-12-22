@@ -25,6 +25,7 @@ class _SignupScreenState extends State<SignupScreen> {
         await context.read<AuthService>().signUp(
           _emailController.text.trim(),
           _passwordController.text.trim(),
+          _nameController.text.trim(),
         );
         if (mounted) {
           Navigator.pushReplacementNamed(context, '/home');

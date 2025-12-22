@@ -1,11 +1,12 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../theme/app_theme.dart';
 import '../../services/firestore_service.dart';
 import '../../services/auth_service.dart';
-import '../../services/storage_service.dart';
+import '../../utils/image_utils.dart';
 import '../../models/item_model.dart';
 
 class AddItemScreen extends StatefulWidget {
@@ -16,6 +17,7 @@ class AddItemScreen extends StatefulWidget {
 }
 
 class _AddItemScreenState extends State<AddItemScreen> {
+  // ... (keep variables)
   final _formKey = GlobalKey<FormState>();
   XFile? _imageFile;
   final ImagePicker _picker = ImagePicker();
@@ -47,14 +49,14 @@ class _AddItemScreenState extends State<AddItemScreen> {
       try {
         final authService = context.read<AuthService>();
         final firestoreService = context.read<FirestoreService>();
-        // Check user before upload to save bandwidth if not logged in (though validate() should handle it ideally)
         if (authService.currentUser == null) throw 'User not logged in';
         
         String imageUrl = '';
         if (_imageFile != null) {
-           imageUrl = await StorageService().uploadImage(_imageFile!, 'items');
-        } else {
-           imageUrl = 'https://via.placeholder.com/300';
+           final base64String = await ImageUtils.fileToBase64(_imageFile!);
+           if (base64String != null) {
+             imageUrl = base64String;
+           }
         }
 
         if (!mounted) return;
@@ -121,13 +123,19 @@ class _AddItemScreenState extends State<AddItemScreen> {
                             ),
                           ],
                         )
-                      : ClipRRect(
-                          borderRadius: BorderRadius.circular(15),
-                          child: Image.file(
-                             File(_imageFile!.path),
-                             fit: BoxFit.cover,
+
+                        : ClipRRect(
+                            borderRadius: BorderRadius.circular(15),
+                            child: kIsWeb 
+                              ? Image.network(
+                                  _imageFile!.path,
+                                  fit: BoxFit.cover,
+                                )
+                              : Image.file(
+                                  File(_imageFile!.path),
+                                  fit: BoxFit.cover,
+                                ),
                           ),
-                        ),
                 ),
               ),
               const SizedBox(height: 24),

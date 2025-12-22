@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../services/firestore_service.dart';
 import '../../theme/app_theme.dart';
 import '../../models/item_model.dart';
+import '../widgets/universal_image.dart';
 
 class ItemDetailsScreen extends StatelessWidget {
   final Item item;
@@ -17,11 +20,9 @@ class ItemDetailsScreen extends StatelessWidget {
             expandedHeight: 300,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
-              background: Image.network(
-                item.imageUrl,
+              background: UniversalImage(
+                imageUrl: item.imageUrl,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => 
-                  const Center(child: Icon(Icons.image_not_supported, size: 64, color: Colors.grey)),
               ),
             ),
           ),
@@ -130,11 +131,22 @@ class ItemDetailsScreen extends StatelessWidget {
           width: double.infinity,
           height: 56,
           child: ElevatedButton(
-            onPressed: () {
-              // TODO: Show date picker and confirm rent
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Request sent to owner!')),
-              );
+            onPressed: () async {
+              try {
+                await context.read<FirestoreService>().rentItem(item.id);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Item successfully rented!')),
+                  );
+                  Navigator.pop(context); // Go back home
+                }
+              } catch (e) {
+                if (context.mounted) {
+                   ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Failed to rent: $e')),
+                  );
+                }
+              }
             },
             child: const Text('Rent Now'),
           ),
