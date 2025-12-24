@@ -28,7 +28,7 @@ class _SignupScreenState extends State<SignupScreen> {
           _nameController.text.trim(),
         );
         if (mounted) {
-          Navigator.pushReplacementNamed(context, '/home');
+          Navigator.pushReplacementNamed(context, '/main');
         }
       } catch (e) {
         if (mounted) {

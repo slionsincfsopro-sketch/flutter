@@ -6,6 +6,7 @@ import 'theme/app_theme.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/signup_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/main_screen.dart';
 import 'services/auth_service.dart';
 import 'services/firestore_service.dart';
 
@@ -41,7 +42,8 @@ class MyApp extends StatelessWidget {
         routes: {
           '/login': (context) => const LoginScreen(),
           '/signup': (context) => const SignupScreen(),
-          '/home': (context) => const HomeScreen(),
+          '/home': (context) => const MainScreen(), // Legacy support
+          '/main': (context) => const MainScreen(),
         },
       ),
     );
